@@ -12,9 +12,9 @@
 ## 安装
 
 ```bash
-npm install animation-library
-pnpm add animation-library
-yarn add animation-library
+npm install @leben/animation-library
+pnpm add @leben/animation-library
+yarn add @leben/animation-library
 ```
 
 ## 基本用法
@@ -37,7 +37,6 @@ animation.play();  // 播放
 animation.pause(); // 暂停
 animation.stop();  // 停止并重置
 ```
-
 
 ## API文档
 

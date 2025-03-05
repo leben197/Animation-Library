@@ -1,0 +1,194 @@
+/canvas/index.html -->
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas 动画示例</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #2d2d2d;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #61dafb;
+    }
+
+    .mode-indicator {
+      background-color: #333;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #61dafb;
+      font-weight: bold;
+    }
+
+    .animation-container {
+      width: 100%;
+      height: 400px;
+      margin: 20px 0;
+      border: 1px solid #444;
+      position: relative;
+      overflow: hidden;
+      border-radius: 4px;
+      background-color: #222;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: bold;
+      min-width: 100px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-play {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .btn-play:hover:not(:disabled) {
+      background-color: #3e8e41;
+      transform: translateY(-2px);
+    }
+
+    .btn-pause {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .btn-pause:hover:not(:disabled) {
+      background-color: #0b7dda;
+      transform: translateY(-2px);
+    }
+
+    .btn-stop {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .btn-stop:hover:not(:disabled) {
+      background-color: #d32f2f;
+      transform: translateY(-2px);
+    }
+
+    .info-panel {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+
+    .info-panel h3 {
+      margin-top: 0;
+      color: #61dafb;
+    }
+
+    .loading-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #61dafb;
+      font-size: 18px;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 15px 25px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .loading-indicator.active {
+      display: block;
+    }
+
+    .fps-counter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #4CAF50;
+      font-family: monospace;
+      padding: 5px;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Canvas 动画演示</h1>
+      <div class="mode-indicator">Canvas 渲染</div>
+    </header>
+
+    <div class="animation-container" id="animation-container">
+      <div class="loading-indicator active" id="loading-indicator">加载中...</div>
+      <div class="fps-counter" id="fps-counter">FPS: --</div>
+    </div>
+
+    <div class="controls">
+      <button id="play-btn" class="btn btn-play" disabled>播放</button>
+      <button id="pause-btn" class="btn btn-pause" disabled>暂停</button>
+      <button id="stop-btn" class="btn btn-stop" disabled>停止</button>
+    </div>
+
+    <div class="info-panel">
+      <h3>Canvas 渲染说明</h3>
+      <p>
+        本示例使用 Canvas API 进行动画渲染，相比 CSS3 动画模式，Canvas 渲染具有以下特点：
+      </p>
+      <ul>
+        <li>适用于所有浏览器，兼容性更好</li>
+        <li>适合复杂的像素级操作和变换</li>
+        <li>提供更精确的动画控制</li>
+        <li>能够处理更大量的动画对象</li>
+      </ul>
+      <p>
+        在不支持 CSS3 动画的浏览器中，动画库会自动回退到 Canvas 渲染模式。
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+
+</html>

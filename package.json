@@ -1,17 +1,35 @@
 {
   "name": "animation-library",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "一个支持CSS3和Canvas的动画库",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "type-check": "tsc --noEmit",
+    "build": "vite build",
+    "prepublishOnly": "npm run type-check && npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "animation",
+    "canvas",
+    "css3"
+  ],
   "author": "leben",
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "devDependencies": {
     "@types/node": "^22.13.9",
-    "typescript": "^5.8.2"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "terser": "^5.39.0",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0",
+    "vite-plugin-dts": "^4.5.3"
   },
   "license": "MIT"
 }

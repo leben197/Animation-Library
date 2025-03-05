@@ -1,72 +1,84 @@
-/**
- * 图片加载回调函数类型
- * @param img 已加载的图片元素
- * @param event 加载事件对象
- */
-type LoadCallback = (img: HTMLImageElement, event: Event) => void;
+import { SpriteSheetOptions } from "./types";
 
 /**
- * 图片预加载器
- * 负责批量加载图片资源，提供加载进度回调，并在全部加载完成后通知
- * 用于确保动画开始前所有图片资源已准备就绪，避免播放过程中出现加载延迟
+ * Preloader - 图片预加载器
+ * 负责加载所有图片资源并跟踪加载进度
  */
 export class Preloader {
-  /** 已加载图片的缓存数组，索引与传入的URL数组对应 */
-  private loadCache: HTMLImageElement[] = [];
-  /** 是否所有图片都已加载完成 */
-  public isLoaded = false;
+  /** 已加载的图像元素数组 */
+  private images: HTMLImageElement[] = [];
+  /** 已加载的图像数量 */
+  private loaded = 0;
+  /** 需要加载的总图像数量 */
+  private total = 0;
+  /** 精灵图 */
+  private spriteImage: HTMLImageElement | null = null;
 
   /**
-   * 创建一个图片预加载器实例
-   * @param imgs 要加载的图片URL数组
-   * @param onLoading 加载进度回调函数，参数为0-1之间的进度值
-   * @param onComplete 加载完成回调函数，参数为加载完成的图片元素数组
+   * 创建一个新的预加载器实例
+   * @param imgPaths 需要加载的图像路径数组
+   * @param onProgress 加载进度回调函数
+   * @param onComplete 加载完成回调函数
    */
   constructor(
-    private imgs: string[],
-    private onLoading: (progress: number) => void,
-    private onComplete: (images: HTMLImageElement[]) => void
+    private imgPaths: string[],
+    private onProgress: (progress: number) => void,
+    private onComplete: (images: HTMLImageElement[]) => void,
+    private isSprite: boolean = false,
+    private spriteSheet?: SpriteSheetOptions
   ) {
-    this.loadImages();
+    if (isSprite || spriteSheet) {
+      // 精灵模式下只需加载一张图像
+      this.total = 1;
+      const imgSrc = spriteSheet ? spriteSheet.src : (imgPaths.length > 0 ? imgPaths[0] : '');
+
+      if (imgSrc) {
+        this.spriteImage = new Image();
+        this.spriteImage.onload = () => this.handleImageLoad(this.spriteImage!);
+        this.spriteImage.onerror = () => {
+          console.error(`Failed to load sprite image: ${imgSrc}`);
+          this.handleImageLoad();
+        };
+        this.spriteImage.src = imgSrc;
+      } else {
+        console.error("No sprite image source provided");
+        this.onComplete([]);
+      }
+    } else {
+      // 常规模式，加载所有图像
+      this.total = imgPaths.length;
+
+      if (this.total === 0) {
+        this.onComplete(this.images);
+        return;
+      }
+
+      imgPaths.forEach((path) => {
+        const img = new Image();
+        img.onload = () => this.handleImageLoad(img);
+        img.onerror = () => {
+          console.error(`Failed to load image: ${path}`);
+          this.handleImageLoad();
+        };
+        img.src = path;
+      });
+    }
   }
 
   /**
-   * 加载单张图片
-   * 创建Image元素并设置加载事件处理
-   * @param url 图片URL地址
-   * @param index 在图片数组中的索引位置
-   * @returns Promise对象，解析为加载完成的图片元素
+   * 处理单个图像加载完成事件
    */
-  private loadImage(url: string, index: number): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = (e) => {
-        this.loadCache[index] = img;
-        this.progressHandler();
-        resolve(img);
-      };
-      img.onerror = (e) => reject(e);
-      img.src = url;
-    });
-  }
+  private handleImageLoad(img?: HTMLImageElement) {
+    if (img) {
+      this.images.push(img);
+    }
 
-  /**
-   * 批量加载所有图片
-   * 并行处理所有图片的加载过程，完成后调用回调
-   */
-  private async loadImages() {
-    const promises = this.imgs.map((url, i) => this.loadImage(url, i));
-    await Promise.all(promises);
-    this.isLoaded = true;
-    this.onComplete(this.loadCache);
-  }
+    this.loaded++;
+    this.onProgress(this.loaded / this.total);
 
-  /**
-   * 处理并报告加载进度
-   * 计算当前已加载图片比例并触发进度回调
-   */
-  private progressHandler() {
-    const loaded = this.loadCache.filter(Boolean).length;
-    this.onLoading(loaded / this.imgs.length);
+    // 当所有图像加载完成时调用完成回调
+    if (this.loaded === this.total) {
+      this.onComplete(this.images);
+    }
   }
 }

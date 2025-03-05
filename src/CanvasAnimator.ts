@@ -1,120 +1,207 @@
-import { AnimationInterface, FrameOptions } from "./types";
+import { AnimationInterface, FrameOptions, SpriteSheetOptions } from "./types";
 
 /**
- * Canvas动画渲染器
- * 使用Canvas API实现帧动画效果，通过绘制图像序列实现动画
- * 适用于需要高性能动画或特殊视觉效果的场景
+ * CanvasAnimator - Canvas 渲染器实现
+ * 使用Canvas API进行序列帧动画的渲染
  */
 export class CanvasAnimator implements AnimationInterface {
-/** Canvas元素 */
-  private canvas!: HTMLCanvasElement;
+  /** Canvas元素 */
+  private canvas: HTMLCanvasElement;
   /** Canvas 2D渲染上下文 */
-  private ctx!: CanvasRenderingContext2D;
-  /** 动画帧请求ID，用于取消动画 */
-  private animationFrameId!: number;
-  /** 当前显示的帧索引 */
-  private currentIndex = 0;
-  /** 动画是否正在播放 */
+  private ctx: CanvasRenderingContext2D;
+  /** 当前动画帧索引 */
+  private currentFrame = 0;
+  /** 计时器ID */
+  private timerId: number | null = null;
+  /** 动画是否正在运行 */
   private isPlaying = false;
+  /** 帧率间隔(毫秒) */
+  private frameInterval: number;
+  /** 是否启用循环播放 */
+  private loop: boolean;
+  /** 使用的图像数组 */
+  private images: HTMLImageElement[];
+  /** 是否使用精灵图模式 */
+  private isSprite: boolean;
+  /** 精灵图中的帧数 */
+  private framesNum: number;
+  /** 帧间距 */
+  private spaceBetween: number;
+  /** 精灵表配置 */
+  private spriteSheet?: SpriteSheetOptions;
+  /** 回调函数 */
+  private onPlay?: (instance: any) => void;
+  private onPaused?: (instance: any) => void;
+  private onStop?: (instance: any) => void;
+  private onEnded?: (instance: any) => void;
 
   /**
-   * 创建Canvas动画渲染器
+   * 创建一个新的Canvas渲染器实例
    * @param options 动画配置选项
-   * @param images 预加载的图像元素数组
+   * @param images 已加载的图像元素数组
    */
-  constructor(
-    private options: FrameOptions,
-    private images: HTMLImageElement[]
-  ) {
-    this.initCanvas();
-    this.renderFrame();
+  constructor(private options: FrameOptions, images: HTMLImageElement[]) {
+    // 创建Canvas元素
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = options.width;
+    this.canvas.height = options.height;
+
+    // 处理frameWrap，可能是字符串选择器或DOM元素
+    let container: HTMLElement;
+    if (typeof options.frameWrap === 'string') {
+      const element = document.querySelector(options.frameWrap);
+      if (!element) throw new Error(`找不到元素: ${options.frameWrap}`);
+      container = element as HTMLElement;
+    } else {
+      container = options.frameWrap;
+    }
+    container.appendChild(this.canvas);
+
+    // 获取渲染上下文
+    const ctx = this.canvas.getContext('2d');
+    if (!ctx) throw new Error('无法获取Canvas 2D上下文');
+    this.ctx = ctx;
+
+    // 初始化动画参数
+    this.frameInterval = 1000 / (options.speed || 30);
+    this.loop = options.loop !== false;
+    this.images = images;
+    this.isSprite = !!options.isSprite;
+    this.framesNum = options.framesNum || 1;
+    this.spaceBetween = options.spaceBetween || 0;
+    this.spriteSheet = options.spriteSheet;
+
+    // 存储回调函数
+    this.onPlay = options.onPlay;
+    this.onPaused = options.onPaused;
+    this.onStop = options.onStop;
+    this.onEnded = options.onEnded;
   }
 
   /**
-   * 初始化Canvas元素
-   * 创建Canvas并添加到指定的容器中
+   * 绘制当前帧
    */
-  private initCanvas() {
-    // 创建Canvas元素
-    this.canvas = document.createElement("canvas");
-    this.canvas.width = this.options.width;
-    this.canvas.height = this.options.height;
-    // 获取绘图上下文
-    this.ctx = this.canvas.getContext("2d")!;
+  private draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // 获取容器元素，支持选择器字符串或DOM元素
-    const container = typeof this.options.frameWrap === "string"
-      ? document.querySelector(this.options.frameWrap)
-      : this.options.frameWrap;
+    if (this.isSprite && this.images[0]) {
+      // 使用isSprite模式 - 单张图包含多帧
+      const spriteImg = this.images[0];
+      const frameWidth = spriteImg.width / this.framesNum;
+      const frameHeight = spriteImg.height;
 
-    // 将Canvas添加到容器
-    container?.appendChild(this.canvas);
+      // 计算当前帧的x偏移
+      const sourceX = this.currentFrame * (frameWidth + this.spaceBetween);
+
+      this.ctx.drawImage(
+        spriteImg,
+        sourceX, 0, frameWidth, frameHeight,
+        0, 0, this.canvas.width, this.canvas.height
+      );
+    } else if (this.spriteSheet && this.images[0]) {
+      // 使用spriteSheet配置
+      const { frameWidth, frameHeight, frames } = this.spriteSheet;
+      const spriteImg = this.images[0];
+
+      // 计算sprite sheet中的行列
+      const framesPerRow = Math.floor(spriteImg.width / frameWidth);
+      const row = Math.floor(this.currentFrame / framesPerRow);
+      const col = this.currentFrame % framesPerRow;
+
+      this.ctx.drawImage(
+        spriteImg,
+        col * frameWidth, row * frameHeight, frameWidth, frameHeight,
+        0, 0, this.canvas.width, this.canvas.height
+      );
+    } else {
+      // 使用多张图片模式
+      const img = this.images[this.currentFrame];
+      if (img) {
+        this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
+      }
+    }
+  }
+
+  /**
+   * 更新动画 - 显示下一帧并计划下一次更新
+   */
+  private update() {
+    this.draw();
+
+    // 确定最大帧数
+    let maxFrames: number;
+    if (this.isSprite) {
+      maxFrames = this.framesNum;
+    } else if (this.spriteSheet) {
+      maxFrames = this.spriteSheet.frames;
+    } else {
+      maxFrames = this.images.length;
+    }
+
+    this.currentFrame++;
+    if (this.currentFrame >= maxFrames) {
+      if (this.loop) {
+        this.currentFrame = 0;
+      } else {
+        this.currentFrame = maxFrames - 1;
+        this.pause();
+        this.onEnded?.(this);
+        return;
+      }
+    }
+
+    if (this.isPlaying) {
+      this.timerId = window.setTimeout(() => this.update(), this.frameInterval);
+    }
   }
 
   /**
    * 开始播放动画
    * @param stopAtBeginning 是否从第一帧开始播放，默认为false
+   * @param idx 指定开始播放的帧索引
    */
-  play(stopAtBeginning = false) {
-    // 如果已经在播放，则不执行任何操作
-    if (this.isPlaying) return;
+  play(stopAtBeginning?: boolean, idx?: number): void {
+    if (stopAtBeginning) {
+      this.currentFrame = 0;
+    }
 
-    this.isPlaying = true;
-    let lastTime = performance.now();
+    if (typeof idx === 'number' && idx >= 0) {
+      // 如果指定了起始帧，则从指定帧开始
+      const maxFrames = this.isSprite
+        ? this.framesNum
+        : (this.spriteSheet?.frames || this.images.length);
 
-    // 动画循环函数
-    const animate = () => {
-      if (!this.isPlaying) return;
+      this.currentFrame = Math.min(idx, maxFrames - 1);
+    }
 
-      // 基于时间间隔控制帧率
-      const now = performance.now();
-      if (now - lastTime >= (this.options.speed || 100)) {
-        // 更新到下一帧并循环
-        this.currentIndex = (this.currentIndex + 1) % this.images.length;
-        this.renderFrame();
-        lastTime = now;
-      }
-      // 请求下一帧
-      this.animationFrameId = requestAnimationFrame(animate);
-    };
-
-    // 启动动画循环
-    animate();
-  }
-
-  /**
-   * 渲染当前帧到Canvas
-   * 清除之前的内容并绘制新的帧
-   */
-  private renderFrame() {
-    // 清除整个Canvas区域
-    this.ctx.clearRect(0, 0, this.options.width, this.options.height);
-    // 绘制当前帧图像
-    this.ctx.drawImage(
-      this.images[this.currentIndex],
-      0,
-      0,
-      this.options.width,
-      this.options.height
-    );
+    if (!this.isPlaying) {
+      this.isPlaying = true;
+      this.onPlay?.(this);
+      this.update();
+    }
   }
 
   /**
    * 暂停动画播放
-   * 停止动画循环但保留当前帧
    */
-  pause() {
-    this.isPlaying = false;
-    cancelAnimationFrame(this.animationFrameId);
+  pause(): void {
+    if (this.isPlaying) {
+      this.isPlaying = false;
+      if (this.timerId !== null) {
+        clearTimeout(this.timerId);
+        this.timerId = null;
+      }
+      this.onPaused?.(this);
+    }
   }
 
   /**
-   * 停止动画播放
-   * 重置到第一帧，并取消动画循环
+   * 停止动画播放并重置到第一帧
    */
-  stop() {
+  stop(): void {
     this.pause();
-    this.currentIndex = 0;
-    this.renderFrame();
+    this.currentFrame = 0;
+    this.draw();
+    this.onStop?.(this);
   }
 }

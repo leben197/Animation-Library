@@ -28,6 +28,9 @@ export class Frame implements AnimationInterface {
    * @param options 动画配置选项
    */
   private async init(options: FrameOptions) {
+    // 使用isSprite或spriteSheet判断是否为精灵图模式
+    const isUsingSprite = options.isSprite || !!options.spriteSheet;
+
     this.preloader = new Preloader(
       options.imgs,
       (progress) => console.log(`Loading: ${progress * 100}%`),
@@ -35,7 +38,9 @@ export class Frame implements AnimationInterface {
         this.animator = this.createAnimator(options, images);
         options.onReady?.();
         if (options.autoPlay) this.play();
-      }
+      },
+      options.isSprite,
+      options.spriteSheet
     );
   }
 
@@ -58,7 +63,7 @@ export class Frame implements AnimationInterface {
     } else if (renderer === 'css') {
       return new CSS3Animator(options, images);
     } else {
-    // 'auto'模式 - 根据浏览器支持情况选择
+      // 'auto'模式 - 根据浏览器支持情况选择
       if (this.supportsCSS3Animations()) {
         return new CSS3Animator(options, images);
       }
@@ -78,9 +83,10 @@ export class Frame implements AnimationInterface {
   /**
    * 开始播放动画
    * @param stopAtBeginning 是否从第一帧开始播放，默认为false
+   * @param idx 指定开始播放的帧索引
    */
-  play(stopAtBeginning?: boolean): void {
-    this.animator?.play(stopAtBeginning);
+  play(stopAtBeginning?: boolean, idx?: number): void {
+    this.animator?.play(stopAtBeginning, idx);
   }
 
   /**

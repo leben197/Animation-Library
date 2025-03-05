@@ -1,3 +1,6 @@
+//渲染模式
+export type RendererType = 'auto' | 'css' | 'canvas';
+//帧动画配置选项
 export interface FrameOptions {
   imgs: string[];
   frameWrap: HTMLElement | string;
@@ -14,8 +17,9 @@ export interface FrameOptions {
   onPaused?: (instance: any) => void;
   onStop?: (instance: any) => void;
   onEnded?: (instance: any) => void;
+  renderer?: RendererType;
 }
-
+//动画接口
 export interface AnimationInterface {
   play: (stopAtBeginning?: boolean, idx?: number) => void;
   pause: () => void;

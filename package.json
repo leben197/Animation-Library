@@ -10,6 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "type-check": "tsc --noEmit",
     "build": "vite build",
+    "dev": "vite serve demo --config demo/vite.config.ts",
+    "dev:basic": "vite serve demo/src/basic",
     "prepublishOnly": "npm run type-check && npm run build"
   },
   "keywords": [

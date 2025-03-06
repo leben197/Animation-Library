@@ -10,11 +10,11 @@ export class CSS3Animator implements AnimationInterface {
   /** 动画容器元素 */
   private container: HTMLElement;
   /** 主动画元素 - 用于精灵图模式 */
-  private animElement: HTMLDivElement;
+  private animElement!: HTMLDivElement;
 
   // 双元素交替显示系统 - 只创建2个DOM元素
-  private frontLayer: HTMLDivElement;
-  private backLayer: HTMLDivElement;
+  private frontLayer!: HTMLDivElement;
+  private backLayer!: HTMLDivElement;
   private isFrontActive = true;
 
   /** 当前动画帧索引 */

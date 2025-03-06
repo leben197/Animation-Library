@@ -4,3 +4,4 @@ demo/
 .idea/
 node_modules/
 *.log
+# 不需要忽略 package.json 文件

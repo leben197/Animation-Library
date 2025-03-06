@@ -7,17 +7,19 @@ settings:
 importers:
 
   .:
-    dependencies:
-      rollup-plugin-terser:
-        specifier: ^7.0.2
-        version: 7.0.2(rollup@4.34.9)
     devDependencies:
+      '@leben/animation-library':
+        specifier: ^1.0.1
+        version: 1.0.1(rollup@4.34.9)
       '@types/node':
         specifier: ^22.13.9
         version: 22.13.9
       '@vitejs/plugin-vue':
         specifier: ^5.2.1
         version: 5.2.1(vite@6.2.0(@types/node@22.13.9)(terser@5.39.0))(vue@3.5.13(typescript@5.8.2))
+      rollup-plugin-terser:
+        specifier: ^7.0.2
+        version: 7.0.2(rollup@4.34.9)
       terser:
         specifier: ^5.39.0
         version: 5.39.0
@@ -224,6 +226,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@leben/animation-library@1.0.1':
+    resolution: {integrity: sha512-+8Htjfq6WXWRVVdPM2QTBVvzDpcktoaCw8giWEVh2roh85f0y8C8x6u6snRGSgc0YLpgBzAEEbOQu5aQDGm2QQ==}
 
   '@microsoft/api-extractor-model@7.30.3':
     resolution: {integrity: sha512-yEAvq0F78MmStXdqz9TTT4PZ05Xu5R8nqgwI5xmUmQjWBQ9E6R2n8HB/iZMRciG4rf9iwI2mtuQwIzDXBvHn1w==}
@@ -923,6 +928,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@leben/animation-library@1.0.1(rollup@4.34.9)':
+    dependencies:
+      rollup-plugin-terser: 7.0.2(rollup@4.34.9)
+    transitivePeerDependencies:
+      - rollup
 
   '@microsoft/api-extractor-model@7.30.3(@types/node@22.13.9)':
     dependencies:

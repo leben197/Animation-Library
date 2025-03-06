@@ -51,7 +51,7 @@ const css3Options: FrameOptions = {
   },
   loop: true,
   autoPlay: false,
-  renderer: 'css3',
+  renderer: 'css',
   onReady: () => {
     console.log("CSS3动画已准备就绪!");
     document.getElementById("css3-play")?.removeAttribute("disabled");

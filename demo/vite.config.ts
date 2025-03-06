@@ -1,6 +1,5 @@
-import { resolve } from 'path';
+import path, { resolve } from 'path';
 import { defineConfig } from 'vite';
-
 console.log('vite.config.ts');
 
 export default defineConfig({
@@ -8,8 +7,14 @@ export default defineConfig({
   base: './',
   resolve: {
     alias: {
-      '@lib': resolve(__dirname, '../src')
+      '@': resolve(__dirname, '../src'),
+      '@lib': path.resolve(__dirname, '../../../dist')
     }
+  },
+
+  optimizeDeps: {
+    include: [],
+    exclude: ['@lib']
   },
   server: {
     open: true

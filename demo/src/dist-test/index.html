@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>动画库打包版本测试</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>动画库打包版本测试</h1>
+
+    <div class="animation-panel">
+      <h2>精灵图Canvas渲染:</h2>
+      <div class="animation-wrapper">
+        <div id="canvas-container" class="animation-container"></div>
+        <div class="controls">
+          <button id="canvas-play">播放</button>
+          <button id="canvas-pause">暂停</button>
+          <button id="canvas-stop">停止</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="animation-panel">
+      <h2>精灵图CSS3渲染:</h2>
+      <div class="animation-wrapper">
+        <div id="css3-container" class="animation-container"></div>
+        <div class="controls">
+          <button id="css3-play">播放</button>
+          <button id="css3-pause">暂停</button>
+          <button id="css3-stop">停止</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="animation-panel">
+      <h2>多图序列:</h2>
+      <div class="animation-wrapper">
+        <div id="sequence-container" class="animation-container"></div>
+        <div class="controls">
+          <button id="sequence-play">播放</button>
+          <button id="sequence-pause">暂停</button>
+          <button id="sequence-stop">停止</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+
+</html>

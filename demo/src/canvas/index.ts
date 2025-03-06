@@ -2,40 +2,33 @@
 import { Frame } from "../../../src/index";
 import type { FrameOptions } from "../../../src/types";
 // 图片路径数组 - 根据实际情况调整路径
-const imagePaths = [
-  "../../images/back/back0.webp",
-  "../../images/back/back1.webp",
-  "../../images/back/back2.webp",
-  "../../images/back/back3.webp",
-  "../../images/back/back4.webp",
-  "../../images/back/back5.webp",
-  "../../images/back/back6.webp",
-  "../../images/back/back7.webp",
-  "../../images/back/back8.webp",
-  "../../images/back/back9.webp",
-  "../../images/back/back10.webp",
-  "../../images/back/back11.webp",
-  "../../images/back/back12.webp",
-  "../../images/back/back13.webp",
-  "../../images/back/back14.webp",
-  "../../images/back/back15.webp",
-  "../../images/back/back16.webp",
-  "../../images/back/back17.webp",
-  "../../images/back/back18.webp",
-  "../../images/back/back19.webp",
-];
+// const imagePaths = Array.from({ length: 42 }, (_, i) => `../../images/back/back${i}.webp`);
+const Sprite = ['../../images/0-24.png'];
 // 动画配置
 const options: FrameOptions = {
   frameWrap: document.getElementById("animation-container") as HTMLElement,
-  imgs: imagePaths,
-  width: 750,
-  height: 1624,
-  speed: 10,
+  imgs: Sprite,
+  width: 440,
+  height: 400,
+  speed: 40,
+  spriteSheet: {
+    src: "../../images/0-24.png",
+    frames: 25,
+    frameWidth: 1100,
+    frameHeight: 1000,
+    rows: 25,
+    columns: 1,
+  },
   loop: true,
   autoPlay: false,
   renderer: 'canvas',
   onReady: () => {
     console.log("动画已准备就绪!");
+    const fpsCounter = document.getElementById('fps-counter');
+    if (fpsCounter) {
+      fpsCounter.innerText = `FPS: ${10}`;
+    }
+    document.getElementById("loading-indicator")?.remove();
     document.getElementById("play-btn")?.removeAttribute("disabled");
     document.getElementById("pause-btn")?.removeAttribute("disabled");
     document.getElementById("stop-btn")?.removeAttribute("disabled");

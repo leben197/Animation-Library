@@ -105,3 +105,5 @@ export class Frame implements AnimationInterface {
     this.animator?.stop();
   }
 }
+// 显式导出类型，这是解决问题的关键
+export type { AnimationInterface, FrameOptions };

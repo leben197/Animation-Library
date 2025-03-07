@@ -16,10 +16,6 @@ A simple and efficient JavaScript/TypeScript frame animation library that suppor
 
 ## Installation
 
-收起
-
-bash
-
 ```bash
 npm install @leben/animation-library
 pnpm add @leben/animation-library
@@ -27,10 +23,6 @@ yarn add @leben/animation-library
 ```
 
 ## Basic Usage
-
-收起
-
-typescript
 
 ```typescript
 import { Frame } from '@leben/animation-library';
@@ -55,10 +47,6 @@ animation.stop();  // Stop and reset
 
 ### Horizontally Arranged Sprite Sheet
 
-收起
-
-typescript
-
 ```typescript
 const animation = new Frame({
   imgs: ['sprite-horizontal.png'], // Single horizontally arranged sprite sheet
@@ -76,10 +64,6 @@ const animation = new Frame({
 ### Grid - Arranged Sprite Sheet
 
 It is recommended to use this method for all cases. For single - row and single - column sprite sheets, you can set rows or columns to 1.
-
-收起
-
-typescript
 
 ```typescript
 const animation = new Frame({

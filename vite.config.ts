@@ -1,9 +1,8 @@
-import { resolve } from 'path'
-import { terser } from 'rollup-plugin-terser'
-import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
+import { resolve } from 'path';
+import { ConfigEnv, defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }: ConfigEnv) => {
   const isProduction = mode === 'production';
 
   return {
@@ -43,21 +42,14 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true
     },
 
+
     plugins: [
       dts({
     // 确保只为src目录生成类型定义
         include: ['src/index.ts'], // 仅生成types.d.ts文件
         exclude: ['demo/**/*', 'node_modules/**/*']
-      }),
-      terser({
-        mangle: {
-          properties: {
-            regex: /^_/
-          }
-        }
       })
     ],
-
     // 开发服务器配置（不会影响构建）
     server: {
       port: 5173,

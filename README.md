@@ -1,4 +1,6 @@
-# Animation Library
+# **中文** | [English](https://github.com/1979044994/Animation-Library/blob/main/README.en-US.md)
+
+# Animation Library [![GitHub stars](https://img.shields.io/github/stars/1979044994/Animation-Library.svg?style=social&label=Star)](https://github.com/1979044994/Animation-Library)
 
 一个简单高效的JavaScript/TypeScript帧动画库，支持Canvas和CSS3渲染。
 

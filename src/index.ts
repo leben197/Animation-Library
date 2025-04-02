@@ -23,6 +23,14 @@ export class Frame implements AnimationInterface {
   }
 
   /**
+   * 设置动画显示特定帧
+   * @param idx 要显示的帧索引
+   */
+  setFrameByIndex = (idx: number): void => {
+    this.animator?.setFrameByIndex?.(idx);
+  };
+
+  /**
    * 初始化动画实例
    * 加载所有指定的图片，并在加载完成后创建合适的渲染器
    * @param options 动画配置选项
@@ -31,13 +39,25 @@ export class Frame implements AnimationInterface {
     // 使用isSprite或spriteSheet判断是否为精灵图模式
     const isUsingSprite = options.isSprite || !!options.spriteSheet;
 
+    // 添加进度日志
+    const onProgress = (progress: number) => {
+      const percent = Math.round(progress * 100);
+      // 可以添加自定义进度回调
+      if (typeof options.onProgress === 'function') {
+        options.onProgress(progress);
+      }
+    };
+
     this.preloader = new Preloader(
       options.imgs,
-      (progress) => console.log(`Loading: ${progress * 100}%`),
+      onProgress,
       (images) => {
         this.animator = this.createAnimator(options, images);
         options.onReady?.();
-        if (options.autoPlay) this.play();
+        if (options.autoPlay) {
+          // 稍微延迟自动播放以确保渲染器已准备就绪
+          setTimeout(() => this.play(), 50);
+        }
       },
       options.isSprite,
       options.spriteSheet
@@ -105,5 +125,10 @@ export class Frame implements AnimationInterface {
     this.animator?.stop();
   }
 }
-// 显式导出类型，这是解决问题的关键
-export type { AnimationInterface, FrameOptions };
+
+
+// 内联导出所有类型，避免外部导入
+// export type { AnimationInterface, FrameOptions, SpriteSheetOptions } from './types';
+
+// 使用重新导出方式,将类型内联到最终的d.ts文件
+export * from './types';

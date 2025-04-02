@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Worker 动画对比</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .test-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .test-section {
+      width: 45%;
+      min-width: 400px;
+      margin-bottom: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #444;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .animation-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      background: #eaeaea;
+      padding: 10px 0;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .loading-status {
+      text-align: center;
+      margin-bottom: 10px;
+      font-style: italic;
+      color: #666;
+    }
+
+    .stats {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      text-align: center;
+    }
+
+    .info {
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: #eee;
+      width: 100%;
+      margin-bottom: 10px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #4CAF50;
+      width: 0;
+      transition: width 0.3s;
+    }
+
+    .stress-controls {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+    }
+
+    .stress-controls h3 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .slider-container label {
+      margin-right: 10px;
+      min-width: 120px;
+    }
+
+    .slider-container input[type="range"] {
+      flex: 1;
+    }
+
+    .slider-value {
+      margin-left: 10px;
+      font-weight: bold;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-switch input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .test-box {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      margin: 2px;
+      font-size: 10px;
+      text-align: center;
+      line-height: 30px;
+      color: white;
+    }
+
+    #ui-test-result {
+      max-height: 150px;
+      overflow: auto;
+      background: #f0f0f0;
+      padding: 5px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    #stress-result {
+      font-family: monospace;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Web Worker 动画性能对比</h1>
+
+  <div class="stress-controls">
+    <h3>压力测试控制</h3>
+    <div class="slider-container">
+      <label for="effect-intensity">处理强度:</label>
+      <input type="range" id="effect-intensity" min="0" max="3" value="1" step="1">
+      <span id="intensity-value" class="slider-value">1</span>
+    </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="stress-toggle">
+      <label for="stress-toggle">启用主线程压力测试</label>
+    </div>
+    <div id="cpu-stress" style="margin-top: 5px; font-size: 12px; color: #777;">状态: 空闲</div>
+    <div id="stress-result"></div>
+  </div>
+
+  <div>
+    <button id="ui-test-btn" class="btn">测试UI响应性</button>
+    <span id="ui-response-time" style="margin-left: 10px; font-size: 14px;"></span>
+    <div id="ui-test-result"></div>
+  </div>
+
+  <div class="test-container">
+    <!-- 常规动画（不使用Worker） -->
+    <div class="test-section">
+      <h2>常规动画 (主线程)</h2>
+      <div class="loading-status" id="regular-loading">准备中...</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="regular-progress"></div>
+      </div>
+      <div class="animation-container" id="regular-container"></div>
+      <div class="controls">
+        <button id="regular-play-btn" disabled>播放</button>
+        <button id="regular-pause-btn" disabled>暂停</button>
+        <button id="regular-stop-btn" disabled>停止</button>
+      </div>
+      <div class="stats" id="regular-stats">FPS: -- | 平均: -- | 最低: -- | 最高: --</div>
+      <div class="info">
+        <p>此动画在主线程中渲染。在处理大量动画或高分辨率图像时，可能会导致UI卡顿。</p>
+        <p><strong>注意:</strong> 启用"主线程压力测试"会更明显地看出主线程版本的卡顿。</p>
+      </div>
+    </div>
+
+    <!-- Worker动画 -->
+    <div class="test-section">
+      <h2>Web Worker 动画 (独立线程)</h2>
+      <div class="loading-status" id="worker-loading">准备中...</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="worker-progress"></div>
+      </div>
+      <div class="animation-container" id="worker-container"></div>
+      <div class="controls">
+        <button id="worker-play-btn" disabled>播放</button>
+        <button id="worker-pause-btn" disabled>暂停</button>
+        <button id="worker-stop-btn" disabled>停止</button>
+      </div>
+      <div class="stats" id="worker-stats">FPS: -- | 平均: -- | 最低: -- | 最高: --</div>
+      <div class="info">
+        <p>此动画使用Web Worker在独立线程中渲染。即使主线程被阻塞，动画仍然能保持流畅。</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+
+</html>

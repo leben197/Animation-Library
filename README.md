@@ -136,4 +136,47 @@ CSS3Animator采用了多种优化技术确保动画平滑无闪烁：
 3. **渲染优化** ：避免不必要的重绘，仅在图像发生变化时更新DOM
 4. **精确帧控制** ：使用requestAnimationFrame确保最佳性能和精确的帧定时
 
+### 高级性能选项
+
+库提供了多种高级性能优化选项：
+
+```typescript
+const animation = new Frame({
+  // ...基本配置...
+
+  // 性能优化配置
+  performance: {
+    useFrameCache: true,     // 启用帧缓存以避免重复渲染
+    useOffscreen: true,      // 使用离屏Canvas渲染
+    maxCacheFrames: 50       // 最大缓存帧数量
+  },
+
+  // Web Worker配置（仅Canvas渲染器）
+  workerOptions: {
+    enabled: true,                      // 启用Web Worker
+    workerPath: './custom-worker.js'    // 可选：自定义Worker脚本路径
+  }
+});
+```
+
+### Web Worker 支持
+
+对于计算密集型的动画，库已支持通过Web Worker将渲染工作放到独立线程，避免阻塞主线程，特别适合:
+
+- 大尺寸Canvas渲染
+- 高帧率动画
+- 需要实时滤镜或效果的动画
+
+使用Worker时，确保在您的构建配置中正确处理Worker文件的打包。您需要确保 `render-worker.js`正确打包到您的最终输出目录。
+
+## 其他配置选项
+
+除了基础选项外，库还支持以下高级配置：
+
+| 参数          | 类型                     | 默认值 | 说明                                 |
+| ------------- | ------------------------ | ------ | ------------------------------------ |
+| onProgress    | (progress: number)=>void | -      | 加载进度回调（0-1之间的数值）        |
+| performance   | Object                   | -      | 性能优化选项（仅Canvas渲染器有效）   |
+| workerOptions | Object                   | -      | Web Worker配置（仅Canvas渲染器有效） |
+
 ## 示例

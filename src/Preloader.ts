@@ -74,10 +74,20 @@ export class Preloader {
     }
 
     this.loaded++;
+    const percentage = Math.round((this.loaded / this.total) * 100);
+
     this.onProgress(this.loaded / this.total);
 
     // 当所有图像加载完成时调用完成回调
     if (this.loaded === this.total) {
+
+
+      // 验证所有图像是否真正加载完成
+      const allComplete = this.images.every(img => img.complete);
+      if (!allComplete) {
+        console.warn('部分图像标记为加载完成，但实际未完成');
+      }
+
       this.onComplete(this.images);
     }
   }

@@ -10,47 +10,40 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // 明确指定输出目录
       outDir: 'dist',
       lib: {
-        // 只指定src/index.ts作为入口
+        // 指定主入口
         entry: resolve(__dirname, 'src/index.ts'),
-        name: 'AnimationLibrary',
+        name: 'animationLibrary',
         fileName: (format) => `index.${format}.js`,
         formats: ['es', 'umd']
       },
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: true,
-          drop_debugger: true,
-        },
-        mangle: {
-          properties: {
-            regex: /^_/
-          }
+          drop_console: isProduction,
+          drop_debugger: isProduction,
         }
       },
-      sourcemap: !isProduction, // 生产环境关闭sourcemap
-
-      // 确保只打包核心库代码
+      sourcemap: !isProduction,
       rollupOptions: {
         external: [],
         output: {
-          globals: {}
-        }
+          globals: {},
+
+        },
       },
-
-      // 排除demo目录
-      emptyOutDir: true
     },
-
 
     plugins: [
       dts({
-    // 确保只为src目录生成类型定义
-        include: ['src/index.ts'], // 仅生成types.d.ts文件
-        exclude: ['demo/**/*', 'node_modules/**/*']
+        include: ['src/**/*.ts'],
+
+        exclude: ['demo/**/*', 'node_modules/**/*'],
+        insertTypesEntry: true,
+        rollupTypes: true,
+        outDir: 'dist'
       })
     ],
-    // 开发服务器配置（不会影响构建）
+
     server: {
       port: 5173,
       open: '/demo/src/basic/index.html'

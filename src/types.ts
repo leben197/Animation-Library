@@ -17,6 +17,23 @@ export interface SpriteSheetOptions {
   /** 精灵表的列数 */
   columns: number;
 }
+
+/**
+ * Web Worker配置选项
+ */
+export interface WorkerOptions {
+  /** 是否启用Web Worker */
+  enabled: boolean;
+  /**
+   * Worker文件路径
+   * - 如果不指定，将使用内联Worker
+   * - 路径字符串: 使用自定义Worker文件
+   */
+  workerPath?: string;
+  /** Worker初始化选项 */
+  workerOptions?: any;
+}
+
 /**
  * 动画基础配置
  * 所有配置方式共用的基础属性
@@ -48,6 +65,26 @@ interface BaseFrameOptions {
   onStop?: (instance: any) => void;
   /** 播放结束回调（非循环模式） */
   onEnded?: (instance: any) => void;
+  /** Web Worker配置，用于性能密集型操作 */
+  workerOptions?: WorkerOptions;
+  /** 性能优化选项 */
+  performance?: {
+    /** 是否启用帧缓存 */
+    useFrameCache?: boolean;
+    /** 是否使用离屏渲染 */
+    useOffscreen?: boolean;
+    /** 最大缓存帧数 */
+    maxCacheFrames?: number;
+  };
+  /** 加载进度回调 */
+  onProgress?: (progress: number) => void;
+  /** 预加载选项 */
+  preloadOptions?: {
+    /** 优先加载的帧数 */
+    priorityFrames?: number;
+    /** 预加载超时(毫秒) */
+    timeout?: number;
+  };
 }
 
 /**
@@ -126,4 +163,5 @@ export interface AnimationInterface {
   play: (stopAtBeginning?: boolean, idx?: number) => void;
   pause: () => void;
   stop: () => void;
+  setFrameByIndex: (idx: number) => void;
 }

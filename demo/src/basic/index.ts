@@ -1,15 +1,16 @@
 import { Frame } from "../../../src/index";
 import type { FrameOptions } from "../../../src/types";
 // 图片路径数组 - 根据实际情况调整路径
-const imagePaths = Array.from({ length: 43 }, (_, i) => `../../images/back/back${i}.webp`);
+const getImagePath = (index: number) => `../../images/back/back${index}.webp`;
+const imagePaths = Array.from({ length: 43 }, (_, i) => getImagePath(i));
 // const Sprite = ['../../images/0-24.png'];
 
 // 动画配置
 const options: FrameOptions = {
   frameWrap: document.getElementById("animation-container") as HTMLElement,
   imgs: imagePaths,
-  width: 300,
-  height: 400,
+  width: 325 * 0.6,
+  height: 807 * 0.6,
   // spriteSheet: {
   //   src: "../../images/0-24.png",
   //   frames: 25,
@@ -20,6 +21,8 @@ const options: FrameOptions = {
   // },
   speed: 30,
   loop: true,
+  renderer: "canvas",
+
   autoPlay: false,
   onReady: () => {
     console.log("动画已准备就绪!");

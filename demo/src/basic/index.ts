@@ -1,5 +1,6 @@
-import { Frame } from "../../../src/index";
-import type { FrameOptions } from "../../../src/types";
+import type { FrameOptions } from '@leben/animation-library';
+import { Frame } from '@leben/animation-library';
+
 // 图片路径数组 - 根据实际情况调整路径
 const getImagePath = (index: number) => `../../images/back/back${index}.webp`;
 const imagePaths = Array.from({ length: 43 }, (_, i) => getImagePath(i));
@@ -21,7 +22,7 @@ const options: FrameOptions = {
   // },
   speed: 30,
   loop: true,
-  renderer: "canvas",
+  renderer: "auto",
 
   autoPlay: false,
   onReady: () => {

@@ -95,7 +95,7 @@ function simulateHeavyMainThreadWork(intensity = 1) {
     }
 
     // 持续执行工作
-    if (document.getElementById('stress-toggle')!.checked) {
+    if ((document.getElementById('stress-toggle') as HTMLInputElement)!.checked) {
       requestAnimationFrame(loop);
     } else {
       document.getElementById('cpu-stress')!.textContent = '主线程压力模拟已关闭';
@@ -107,9 +107,14 @@ function simulateHeavyMainThreadWork(intensity = 1) {
 }
 
 // 添加图像处理效果
-function applyImageEffects(canvas, intensity = 1) {
+function applyImageEffects(canvas: HTMLCanvasElement, intensity = 1) {
   try {
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error("无法获取 canvas 上下文");
+      return;
+    }
+
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
@@ -244,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const intensity = parseInt((document.getElementById('effect-intensity') as HTMLInputElement).value);
       // 在每一帧添加高计算量的图像处理
       const processFrame = () => {
-        if (!document.getElementById("regular-play-btn")?.disabled) {
+        if (!(document.getElementById("regular-play-btn") as HTMLButtonElement)?.disabled) {
           applyImageEffects(canvas, intensity);
           requestAnimationFrame(processFrame);
         }

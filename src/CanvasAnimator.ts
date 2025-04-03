@@ -673,4 +673,13 @@ export class CanvasAnimator extends BaseAnimator {
       this.animationRequestId = undefined;
     }
   }
+
+  /**
+   * 设置显示指定索引的帧
+   * @param idx 帧索引
+   */
+  setFrameByIndex(idx: number): void {
+    super.setFrameByIndex(idx); // 调用基类方法更新currentFrame
+    this.draw(); // 手动调用渲染方法
+  }
 }

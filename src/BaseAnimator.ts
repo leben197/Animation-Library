@@ -159,7 +159,8 @@ export abstract class BaseAnimator implements AnimationInterface {
   setFrameByIndex(idx: number): void {
     if (idx >= 0 && idx < this.getFrameCount()) {
       this.currentFrame = idx;
-      this.renderFrame(); // 调用子类实现的渲染方法
+      // 从基类方法中移除自动渲染调用
+      // 让子类在需要时自行决定是否需要渲染
     }
   }
 

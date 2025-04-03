@@ -1,6 +1,6 @@
 {
   "name": "@leben/animation-library",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "一个支持CSS3和Canvas的动画库",
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",

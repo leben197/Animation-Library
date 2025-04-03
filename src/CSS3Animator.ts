@@ -47,9 +47,22 @@ export class CSS3Animator extends BaseAnimator {
     this.animateWithRequestAnimationFrame();
   }
 
-  // 实现抽象方法
+  // 实现抽象方法 - 修复无限递归问题
   protected renderFrame(): void {
-    this.setFrameByIndex(this.currentFrame);
+    // 不再调用 setFrameByIndex，而是直接实现帧渲染逻辑
+    if (this.isSprite || this.spriteSheet) {
+      // 精灵图/精灵表模式 - 改变背景位置
+      if (this.isSprite) {
+        this.setSpritePosition(this.currentFrame);
+      } else if (this.spriteSheet) {
+        this.setSpriteSheetPosition(this.currentFrame);
+      }
+    } else {
+      // 多图序列模式 - 改变背景图像
+      if (this.images[this.currentFrame]) {
+        this.animElement.style.backgroundImage = `url(${this.images[this.currentFrame].src})`;
+      }
+    }
   }
 
   /**
@@ -316,10 +329,20 @@ export class CSS3Animator extends BaseAnimator {
    * 重写setFrameByIndex以实现CSS特定的帧切换
    */
   setFrameByIndex(idx: number): void {
-    // 首先调用父类方法更新currentFrame
-    super.setFrameByIndex(idx);
+    // 不再调用 super.setFrameByIndex 以避免循环调用
+    // 而是直接实现逻辑
 
-    // CSS特定的实现
+    // 检查索引范围
+    const frameCount = this.getFrameCount();
+    if (idx < 0 || idx >= frameCount) {
+      console.error(`帧索引超出范围: ${idx}`);
+      return;
+    }
+
+    // 更新当前帧索引
+    this.currentFrame = idx;
+
+    // 直接调用渲染逻辑，但不通过renderFrame()方法
     if (this.isSprite || this.spriteSheet) {
       // 精灵图/精灵表模式 - 只需改变背景位置
       if (this.isSprite) {

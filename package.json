@@ -11,11 +11,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit -p tsconfig.build.json",
     "build": "vite build",
     "dev": "vite serve demo --config demo/vite.config.ts",
     "dev:basic": "vite serve demo/src/basic",
     "dev:worker": "vite serve demo/src/worker-demo",
+    "dev:spine": "vite serve demo/src/spine-demo",
     "prepublishOnly": "npm run type-check && npm run build"
   },
   "keywords": [

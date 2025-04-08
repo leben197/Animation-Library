@@ -16,17 +16,23 @@ export class Preloader {
 
   /**
    * 创建一个新的预加载器实例
-   * @param imgPaths 需要加载的图像路径数组
+   * @param imgPaths 需要加载的图像路径数组 (可选)
    * @param onProgress 加载进度回调函数
    * @param onComplete 加载完成回调函数
    */
   constructor(
-    private imgPaths: string[],
+    private imgPaths: string[] = [], // 设置默认值为空数组
     private onProgress: (progress: number) => void,
     private onComplete: (images: HTMLImageElement[]) => void,
     private isSprite: boolean = false,
     private spriteSheet?: SpriteSheetOptions
   ) {
+    // 确保imgPaths不为undefined
+    if (!imgPaths) {
+      imgPaths = [];
+      this.imgPaths = [];
+    }
+
     if (isSprite || spriteSheet) {
       // 精灵模式下只需加载一张图像
       this.total = 1;

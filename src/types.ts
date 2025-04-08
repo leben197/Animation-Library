@@ -1,5 +1,9 @@
 //渲染模式
-export type RendererType = 'auto' | 'css' | 'canvas';
+export type RendererType = 'auto' | 'css' | 'canvas' | 'spine' | 'webgl';
+
+// 从spine类型定义文件中导入SpineOptions
+import { SpineOptions } from './types/spine';
+
 /**
  * 精灵表配置选项
  */
@@ -40,7 +44,7 @@ export interface WorkerOptions {
  */
 interface BaseFrameOptions {
   /** 图片路径数组 */
-  imgs: string[];
+  imgs?: string[];
   /** 动画容器元素或选择器 */
   frameWrap: HTMLElement | string;
   /** 动画宽度 */
@@ -111,7 +115,6 @@ interface SpriteFrameOptions extends BaseFrameOptions {
   spriteSheet?: never;
 }
 
-
 /**
  * 精灵表动画配置
  * 使用SpriteSheet对象定义的精灵图
@@ -125,14 +128,29 @@ interface SpriteSheetFrameOptions extends BaseFrameOptions {
 }
 
 /**
+ * 骨骼动画配置
+ * 使用Spine或其他骨骼动画系统
+ */
+interface SpineFrameOptions extends BaseFrameOptions {
+  renderer: 'spine';
+  /** 骨骼动画配置 */
+  spine: SpineOptions;
+  imgs?: string[];
+  isSprite?: never;
+  framesNum?: never;
+  spaceBetween?: never;
+  spriteSheet?: never;
+}
+
+/**
  * 帧动画配置选项
- * 三种不同的配置方式:
+ * 四种不同的配置方式:
  * 1. 普通图片序列模式
  * 2. 精灵图模式(isSprite: true，需指定framesNum)
  * 3. 精灵表模式(提供spriteSheet对象)
+ * 4. 骨骼动画模式(renderer: 'spine', 需指定spine)
  */
-export type FrameOptions = NormalFrameOptions | SpriteFrameOptions | SpriteSheetFrameOptions;
-
+export type FrameOptions = NormalFrameOptions | SpriteFrameOptions | SpriteSheetFrameOptions | SpineFrameOptions;
 
 /**
  * 为了保持向后兼容，同时提供接口版本
@@ -158,6 +176,7 @@ export interface IFrameOptions {
   onEnded?: (instance: any) => void;
   renderer?: RendererType;
 }
+
 //动画接口
 export interface AnimationInterface {
   play: (stopAtBeginning?: boolean, idx?: number) => void;

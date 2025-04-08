@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGL渲染动画示例</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #webgl-container {
+      width: 325px;
+      height: 500px;
+      margin: 0 auto;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .info-panel {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f0f8ff;
+      border-left: 4px solid #1e90ff;
+      border-radius: 4px;
+    }
+
+    .progress-container {
+      margin-top: 10px;
+      background-color: #eee;
+      border-radius: 4px;
+      position: relative;
+      height: 20px;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background-color: #4CAF50;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    #progress-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      color: white;
+      mix-blend-mode: difference;
+    }
+
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+    }
+
+    #fps-display {
+      font-family: monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>WebGL渲染动画示例</h1>
+
+  <div class="container">
+    <div class="progress-container">
+      <div id="progress-bar"></div>
+      <div id="progress-text">0%</div>
+    </div>
+
+    <div id="webgl-container"></div>
+
+    <div class="controls">
+      <button id="play-btn" disabled>播放</button>
+      <button id="pause-btn" disabled>暂停</button>
+      <button id="stop-btn" disabled>停止</button>
+    </div>
+
+    <div class="stats-container">
+      <div id="status">状态: 初始化中</div>
+      <div id="fps-display">FPS: --</div>
+    </div>
+
+    <div class="info-panel">
+      <h3>关于WebGL渲染器</h3>
+      <p>本示例使用WebGL进行高性能渲染。WebGL能够充分利用GPU加速，提供更好的性能和视觉效果。</p>
+      <p>WebGL渲染特别适合:</p>
+      <ul>
+        <li>高分辨率大尺寸动画</li>
+        <li>需要特殊视觉效果的场景</li>
+        <li>游戏和复杂交互式内容</li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module" src="./index.ts"></script>
+</body>
+
+</html>

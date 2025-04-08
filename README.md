@@ -83,6 +83,29 @@ const animation = new Frame({
 });
 ```
 
+## 渲染模式
+
+动画库支持多种渲染模式，可以根据需求选择:
+
+1. **CSS3渲染器** (`renderer: 'css'`) - 使用CSS3动画，低CPU占用，适合简单动画
+2. **Canvas渲染器** (`renderer: 'canvas'`) - 使用Canvas 2D API，兼容性好，适合中等复杂度动画
+3. **WebGL渲染器** (`renderer: 'webgl'`) - 使用GPU加速，性能最佳，适合复杂动画和视觉效果
+4. **Spine骨骼动画** (`renderer: 'spine'`) - 支持Spine骨骼动画格式
+5. **自动选择** (`renderer: 'auto'` 或不指定) - 根据浏览器支持自动选择最佳渲染器
+
+```typescript
+// WebGL渲染示例
+const animation = new Frame({
+  frameWrap: '#container',
+  imgs: ['frame1.png', 'frame2.png', '...'],
+  width: 300,
+  height: 300,
+  renderer: 'webgl',   // 指定使用WebGL渲染
+  speed: 30,
+  loop: true
+});
+```
+
 ## API文档
 
 ### Frame类

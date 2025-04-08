@@ -1,7 +1,10 @@
 import { CanvasAnimator } from "./CanvasAnimator";
 import { CSS3Animator } from "./CSS3Animator";
 import { Preloader } from "./Preloader";
+import { SpineAnimator } from "./SpineAnimator"; // 导入新的骨骼动画渲染器
 import { AnimationInterface, FrameOptions } from "./types";
+import { SpineAnimationInterface } from "./types/spine"; // 导入骨骼动画接口
+import { WebGLAnimator } from "./WebGLAnimator"; // 导入新的WebGL渲染器
 
 /**
  * Frame - 动画库的主要接口类
@@ -19,6 +22,14 @@ export class Frame implements AnimationInterface {
    * @param options 动画配置选项，包含图片路径、尺寸和行为设置
    */
   constructor(options: FrameOptions) {
+    // 如果是骨骼动画，则直接创建SpineAnimator
+    if (options.renderer === 'spine') {
+      this.animator = new SpineAnimator(options);
+      options.onReady?.();
+      return;
+    }
+
+    // 其他类型的动画走原来的逻辑
     this.init(options);
   }
 
@@ -49,7 +60,7 @@ export class Frame implements AnimationInterface {
     };
 
     this.preloader = new Preloader(
-      options.imgs,
+      options.imgs || [], // 确保传递一个数组，即使options.imgs是undefined
       onProgress,
       (images) => {
         this.animator = this.createAnimator(options, images);
@@ -82,9 +93,18 @@ export class Frame implements AnimationInterface {
       return new CanvasAnimator(options, images);
     } else if (renderer === 'css') {
       return new CSS3Animator(options, images);
+    } else if (renderer === 'spine') {
+      // 骨骼动画应该在构造函数中直接处理，这里是防止某些情况下的回退
+      return new SpineAnimator(options);
+    } else if (renderer === 'webgl') {
+      // 使用WebGL渲染器
+      return new WebGLAnimator(options, images);
     } else {
       // 'auto'模式 - 根据浏览器支持情况选择
-      if (this.supportsCSS3Animations()) {
+      if (this.supportsWebGL()) {
+        // 优先使用WebGL渲染
+        return new WebGLAnimator(options, images);
+      } else if (this.supportsCSS3Animations()) {
         return new CSS3Animator(options, images);
       }
       return new CanvasAnimator(options, images);
@@ -98,6 +118,21 @@ export class Frame implements AnimationInterface {
    */
   private supportsCSS3Animations(): boolean {
     return CSS.supports("animation", "test");
+  }
+
+  /**
+   * 检测浏览器是否支持WebGL
+   * 用于auto模式下自动选择最佳渲染器
+   */
+  private supportsWebGL(): boolean {
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext &&
+        (canvas.getContext('webgl') ||
+          canvas.getContext('experimental-webgl')));
+    } catch (e) {
+      return false;
+    }
   }
 
   /**
@@ -123,6 +158,17 @@ export class Frame implements AnimationInterface {
    */
   stop(): void {
     this.animator?.stop();
+  }
+
+  /**
+   * 获取骨骼动画渲染器实例
+   * 当使用骨骼动画时，可以访问更多骨骼特有的API
+   */
+  getSpineAnimator(): SpineAnimationInterface | null {
+    if (this.animator instanceof SpineAnimator) {
+      return this.animator as SpineAnimationInterface;
+    }
+    return null;
   }
 }
 
